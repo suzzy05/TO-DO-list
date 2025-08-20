@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartTask - Intelligent To-Do App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .todo-panel {
+            grid-column: 1;
+        }
+
+        .features-panel {
+            grid-column: 2;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (max-width: 900px) {
+            .todo-panel, .features-panel {
+                grid-column: 1;
+            }
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #6e8efb;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 i {
+            font-size: 1.5rem;
+        }
+
+        .input-group {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px 0 0 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #a777e3;
+        }
+
+        button {
+            background: #6e8efb;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5a7df9;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-buttons button {
+            border-radius: 8px;
+            flex: 1;
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+
+        .filter-buttons button.active {
+            background: #a777e3;
+        }
+
+        ul {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        li {
+            padding: 15px;
+            background: #f8f9ff;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            animation: fadeIn 0.5s;
+        }
+
+        li.completed {
+            background: #f0f0f0;
+        }
+
+        li.completed .task-text {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        .task-text {
+            flex: 1;
+            margin-right: 10px;
+            word-break: break-word;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .task-actions button {
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+
+        .delete-btn {
+            background: #ff6b6b;
+        }
+
+        .delete-btn:hover {
+            background: #ff5252;
+        }
+
+        .complete-btn {
+            background: #4cd964;
+        }
+
+        .complete-btn:hover {
+            background: #38c953;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 5px;
+        }
+
+        .tab-buttons button {
+            flex: 1;
+            border-radius: 8px 8px 0 0;
+            padding: 12px;
+        }
+
+        .tab-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tab-panel {
+            display: none;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .tab-panel.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .youtube-results, .search-results, .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            max-height: 300px;
+        }
+
+        .result-item, .message {
+            padding: 10px 15px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .youtube-item {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .youtube-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .youtube-thumb {
+            width: 80px;
+            height: 60px;
+            background-color: #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff0000;
+            font-size: 20px;
+        }
+
+        .message {
+            max-width: 80%;
+            align-self: flex-start;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: #e3eeff;
+        }
+        
+        .message.bot {
+            background: #f0f0f0;
+        }
+        
+        .message.loading {
+            color: #888;
+            font-style: italic;
+        }
+
+        .chat-input {
+            display: flex;
+            margin-top: 10px;
+        }
+
+        .chat-input input {
+            border-radius: 8px 0 0 8px;
+        }
+
+        .chat-input button {
+            border-radius: 0 8px 8px 0;
+        }
+
+        .feature-icon {
+            font-size: 1.2rem;
+            margin-right: 10px;
+            color: #6e8efb;
+        }
+        
+        .search-input {
+            margin-bottom: 15px;
+        }
+        
+        .search-results a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+        
+        .search-results a:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .motivation-quote {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-style: italic;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-tasks"></i> SmartTask</h1>
+            <p class="tagline">Your intelligent task management assistant</p>
+        </header>
+
+        <div class="app-container">
+            <div class="panel todo-panel">
+                <h2><i class="fas fa-check-circle"></i> My Tasks</h2>
+                
+                <div class="input-group">
+                    <input type="text" id="taskInput" placeholder="Enter a new task...">
+                    <button id="addTaskBtn"><i class="fas fa-plus"></i> Add</button>
+                </div>
+                
+                <div class="filter-buttons">
+                    <button class="active" data-filter="all">All</button>
+                    <button data-filter="active">Active</button>
+                    <button data-filter="completed">Completed</button>
+                </div>
+                
+                <ul id="taskList">
+                    <!-- Tasks will be added here dynamically -->
+                </ul>
+            </div>
+            
+            <div class="panel features-panel">
+                <h2><i class="fas fa-star"></i> Smart Features</h2>
+                
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="youtube"><i class="fab fa-youtube"></i> YouTube</button>
+                    <button class="tab-btn" data-tab="search"><i class="fas fa-search"></i> Search</button>
+                    <button class="tab-btn" data-tab="chatbot"><i class="fas fa-robot"></i> Chat</button>
+                </div>
+                
+                <div class="tab-content">
+                    <div class="tab-panel active" id="youtube-tab">
+                        <p><i class="fas fa-lightbulb feature-icon"></i>Get video recommendations based on your tasks</p>
+                        <div class="youtube-results" id="youtubeResults">
+                            <div class="result-item youtube-item">
+                                <div class="youtube-thumb"><i class="fab fa-youtube"></i></div>
+                                <div>
+                                    <div><strong>Productivity Tips:</strong> How to Stay Focused</div>
+                                    <div style="font-size: 0.8em; color: #666;">1.2M views • 2 months ago</div>
+                                </div>
+                            </div>
+                            <div class="result-item youtube-item">
+                                <div class="youtube-thumb"><i class="fab fa-youtube"></i></div>
+                                <div>
+                                    <div><strong>Learning Python:</strong> Full Beginner Course</div>
+                                    <div style="font-size: 0.8em; color: #666;">3.7M views • 1 year ago</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="refreshYoutube"><i class="fas fa-sync"></i> Refresh Recommendations</button>
+                    </div>
+                    
+                    <div class="tab-panel" id="search-tab">
+                        <p><i class="fas fa-lightbulb feature-icon"></i>Search for resources related to your tasks</p>
+                        <div class="input-group search-input">
+                            <input type="text" id="searchInput" placeholder="Search the web...">
+                            <button id="searchBtn"><i class="fas fa-search"></i></button>
+                        </div>
+                        <div class="search-results" id="searchResults">
+                            <div class="result-item">
+                                <a href="#"><strong>Wikipedia:</strong> Time Management Techniques</a>
+                                <div style="font-size: 0.9em; color: #444;">https://en.wikipedia.org/wiki/Time_management</div>
+                            </div>
+                            <div class="result-item">
+                                <a href="#"><strong>Medium.com:</strong> 10 Productivity Hacks</a>
+                                <div style="font-size: 0.9em; color: #444;">https://medium.com/productivity-hacks</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-panel" id="chatbot-tab">
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="message bot">
+                                <strong>TaskBot:</strong> Hi there! I can help you manage your tasks. What would you like to do?
+                            </div>
+                            <div class="message user">
+                                <strong>You:</strong> How do I mark a task as complete?
+                            </div>
+                            <div class="message bot">
+                                <strong>TaskBot:</strong> Just click the checkmark button next to any task. I can also help you find resources if you're stuck on a task!
+                            </div>
+                        </div>
+                        <div class="chat-input">
+                            <input type="text" id="chatInput" placeholder="Ask something about your tasks...">
+                            <button id="sendChatBtn"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="motivation-quote">
+            <p>"Productivity is never an accident. It is always the result of a commitment to excellence, intelligent planning, and focused effort." - Paul J. Meyer</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const taskInput = document.getElementById('taskInput');
+            const addTaskBtn = document.getElementById('addTaskBtn');
+            const taskList = document.getElementById('taskList');
+            const filterButtons = document.querySelectorAll('.filter-buttons button');
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabPanels = document.querySelectorAll('.tab-panel');
+            const refreshYoutubeBtn = document.getElementById('refreshYoutube');
+            const youtubeResults = document.getElementById('youtubeResults');
+            const searchInput = document.getElementById('searchInput');
+            const searchBtn = document.getElementById('searchBtn');
+            const searchResults = document.getElementById('searchResults');
+            const chatInput = document.getElementById('chatInput');
+            const sendChatBtn = document.getElementById('sendChatBtn');
+            const chatMessages = document.getElementById('chatMessages');
+            
+            // Task array
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            let currentFilter = 'all';
+            
+            // Initialize the app
+            function init() {
+                renderTasks();
+                updateTaskCount();
+                
+                // Load motivational quote
+                loadMotivationalQuote();
+            }
+            
+            // Add new task
+            addTaskBtn.addEventListener('click', addTask);
+            taskInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') addTask();
+            });
+            
+            function addTask() {
+                const taskText = taskInput.value.trim();
+                if (taskText === '') return;
+                
+                const task = {
+                    id: Date.now(),
+                    text: taskText,
+                    completed: false,
+                    timestamp: new Date().toISOString()
+                };
+                
+                tasks.push(task);
+                saveTasks();
+                renderTasks();
+                updateTaskCount();
+                
+                taskInput.value = '';
+                taskInput.focus();
+                
+                // Update YouTube recommendations based on new task
+                updateYoutubeRecommendations();
+            }
+            
+            // Render tasks based on current filter
+            function renderTasks() {
+                taskList.innerHTML = '';
+                
+                let filteredTasks = tasks;
+                if (currentFilter === 'active') {
+                    filteredTasks = tasks.filter(task => !task.completed);
+                } else if (currentFilter === 'completed') {
+                    filteredTasks = tasks.filter(task => task.completed);
+                }
+                
+                if (filteredTasks.length === 0) {
+                    const emptyMessage = document.createElement('li');
+                    emptyMessage.textContent = currentFilter === 'all' ? 'No tasks yet. Add a new task!' :
+                                              currentFilter === 'active' ? 'No active tasks. Great job!' : 
+                                              'No completed tasks yet.';
+                    emptyMessage.classList.add('empty-message');
+                    taskList.appendChild(emptyMessage);
+                    return;
+                }
+                
+                filteredTasks.forEach(task => {
+                    const li = document.createElement('li');
+                    if (task.completed) li.classList.add('completed');
+                    
+                    li.innerHTML = `
+                        <span class="task-text">${task.text}</span>
+                        <div class="task-actions">
+                            <button class="complete-btn"><i class="fas fa-check"></i></button>
+                            <button class="delete-btn"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                    
+                    li.querySelector('.complete-btn').addEventListener('click', () => toggleComplete(task.id));
+                    li.querySelector('.delete-btn').addEventListener('click', () => deleteTask(task.id));
+                    
+                    taskList.appendChild(li);
+                });
+            }
+            
+            // Toggle task completion
+            function toggleComplete(taskId) {
+                tasks = tasks.map(task => {
+                    if (task.id === taskId) {
+                        return {...task, completed: !task.completed};
+                    }
+                    return task;
+                });
+                
+                saveTasks();
+                renderTasks();
+                updateTaskCount();
+            }
+            
+            // Delete task
+            function deleteTask(taskId) {
+                tasks = tasks.filter(task => task.id !== taskId);
+                saveTasks();
+                renderTasks();
+                updateTaskCount();
+            }
+            
+            // Filter tasks
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Update active button
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    currentFilter = this.dataset.filter;
+                    renderTasks();
+                });
+            });
+            
+            // Tab switching
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Update active tab button
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding tab panel
+                    const tabName = this.dataset.tab;
+                    tabPanels.forEach(panel => {
+                        panel.classList.remove('active');
+                        if (panel.id === `${tabName}-tab`) {
+                            panel.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // Save tasks to localStorage
+            function saveTasks() {
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+            }
+            
+            // Update task count (for future use)
+            function updateTaskCount() {
+                const totalTasks = tasks.length;
+                const completedTasks = tasks.filter(task => task.completed).length;
+                const activeTasks = totalTasks - completedTasks;
+                
+                // Could display these counts somewhere in the UI
+                console.log(`Tasks: ${totalTasks}, Active: ${activeTasks}, Completed: ${completedTasks}`);
+            }
+            
+            // Load a motivational quote
+            function loadMotivationalQuote() {
+                const quotes = [
+                    "The way to get started is to quit talking and begin doing. - Walt Disney",
+                    "Your time is limited, so don't waste it living someone else's life. - Steve Jobs",
+                    "It's not whether you get knocked down, it's whether you get up. - Vince Lombardi",
+                    "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt",
+                    "The only limit to our realization of tomorrow will be our doubts of today. - Franklin D. Roosevelt"
+                ];
+                
+                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                document.querySelector('.motivation-quote p').textContent = randomQuote;
+            }
+            
+            // YouTube Recommendations Feature
+            refreshYoutubeBtn.addEventListener('click', updateYoutubeRecommendations);
+            
+            function updateYoutubeRecommendations() {
+                // Show loading state
+                youtubeResults.innerHTML = '<div class="result-item">Loading recommendations...</div>';
+                
+                // Simulate API call delay
+                setTimeout(() => {
+                    // Get keywords from tasks for more relevant recommendations
+                    const taskKeywords = tasks.map(task => {
+                        const words = task.text.split(' ');
+                        return words.length > 2 ? words[1] : words[0];
+                    }).filter(word => word.length > 3);
+                    
+                    // Mock YouTube data based on tasks
+                    const mockVideos = [
+                        {
+                            title: "Productivity Tips: How to Stay Focused",
+                            views: "1.2M views",
+                            time: "2 months ago",
+                            keyword: "productivity"
+                        },
+                        {
+                            title: "Learning Python: Full Beginner Course",
+                            views: "3.7M views",
+                            time: "1 year ago",
+                            keyword: "learning"
+                        },
+                        {
+                            title: "Time Management Mastery",
+                            views: "850K views",
+                            time: "3 weeks ago",
+                            keyword: "time"
+                        },
+                        {
+                            title: "Healthy Cooking for Busy People",
+                            views: "2.4M views",
+                            time: "8 months ago",
+                            keyword: "cooking"
+                        }
+                    ];
+                    
+                    // Filter videos based on task keywords if any
+                    let relevantVideos = mockVideos;
+                    if (taskKeywords.length > 0) {
+                        relevantVideos = mockVideos.filter(video => 
+                            taskKeywords.some(keyword => 
+                                video.keyword.includes(keyword.toLowerCase()) || 
+                                video.title.toLowerCase().includes(keyword.toLowerCase())
+                            )
+                        );
+                        
+                        // If no matches, use all videos
+                        if (relevantVideos.length === 0) {
+                            relevantVideos = mockVideos;
+                        }
+                    }
+                    
+                    // Display videos
+                    youtubeResults.innerHTML = '';
+                    relevantVideos.slice(0, 3).forEach(video => {
+                        const videoElement = document.createElement('div');
+                        videoElement.className = 'result-item youtube-item';
+                        videoElement.innerHTML = `
+                            <div class="youtube-thumb"><i class="fab fa-youtube"></i></div>
+                            <div>
+                                <div><strong>${video.title}</strong></div>
+                                <div style="font-size: 0.8em; color: #666;">${video.views} • ${video.time}</div>
+                            </div>
+                        `;
+                        youtubeResults.appendChild(videoElement);
+                    });
+                }, 1000);
+            }
+            
+            // Search Feature
+            searchBtn.addEventListener('click', performSearch);
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') performSearch();
+            });
+            
+            function performSearch() {
+                const query = searchInput.value.trim();
+                if (query === '') return;
+                
+                // Show loading state
+                searchResults.innerHTML = '<div class="result-item">Searching...</div>';
+                
+                // Simulate API call delay
+                setTimeout(() => {
+                    // Mock search results
+                    const mockResults = [
+                        {
+                            title: `Wikipedia: ${query} Techniques`,
+                            url: `https://en.wikipedia.org/wiki/${query.replace(/\s+/g, '_')}`
+                        },
+                        {
+                            title: `Medium.com: 10 ${query} Hacks`,
+                            url: `https://medium.com/${query.replace(/\s+/g, '-')}-hacks`
+                        },
+                        {
+                            title: `Harvard Business Review: The Science of ${query}`,
+                            url: `https://hbr.org/${query.replace(/\s+/g, '-')}`
+                        }
+                    ];
+                    
+                    // Display results
+                    searchResults.innerHTML = '';
+                    mockResults.forEach(result => {
+                        const resultElement = document.createElement('div');
+                        resultElement.className = 'result-item';
+                        resultElement.innerHTML = `
+                            <a href="${result.url}" target="_blank"><strong>${result.title}</strong></a>
+                            <div style="font-size: 0.9em; color: #444;">${result.url}</div>
+                        `;
+                        searchResults.appendChild(resultElement);
+                    });
+                }, 800);
+            }
+            
+            // Chatbot Feature
+            sendChatBtn.addEventListener('click', sendChatMessage);
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') sendChatMessage();
+            });
+            
+            function sendChatMessage() {
+                const message = chatInput.value.trim();
+                if (message === '') return;
+                
+                // Add user message to chat
+                addChatMessage(message, 'user');
+                chatInput.value = '';
+                
+                // Simulate bot thinking
+                setTimeout(() => {
+                    // Generate bot response
+                    const response = generateBotResponse(message);
+                    addChatMessage(response, 'bot');
+                }, 1000);
+            }
+            
+            function addChatMessage(message, sender) {
+                const messageElement = document.createElement('div');
+                messageElement.className = `message ${sender}`;
+                messageElement.innerHTML = `<strong>${sender === 'user' ? 'You' : 'TaskBot'}:</strong> ${message}`;
+                chatMessages.appendChild(messageElement);
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            function generateBotResponse(message) {
+                message = message.toLowerCase();
+                
+                if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {
+                    return "Hello! How can I help you with your tasks today?";
+                } else if (message.includes('complete') || message.includes('finish')) {
+                    return "To complete a task, click the checkmark button next to it. You can also filter tasks to see only completed ones.";
+                } else if (message.includes('delete') || message.includes('remove')) {
+                    return "To delete a task, click the trash can icon. Be careful though, this action can't be undone!";
+                } else if (message.includes('youtube') || message.includes('video')) {
+                    return "I can recommend YouTube videos related to your tasks. Just go to the YouTube tab to see suggestions.";
+                } else if (message.includes('search') || message.includes('google')) {
+                    return "You can search for task-related resources in the Search tab. Just type what you're looking for!";
+                } else if (message.includes('help')) {
+                    return "I can help you manage tasks, find YouTube videos, search the web, and answer questions. What do you need help with?";
+                } else if (message.includes('thank')) {
+                    return "You're welcome! Is there anything else I can help you with?";
+                } else {
+                    return "I'm not sure I understand. I can help you with task management, YouTube recommendations, and web searches. What would you like to know?";
+                }
+            }
+            
+            // Initialize the app
+            init();
+            
+            // Initial YouTube recommendations
+            updateYoutubeRecommendations();
+        });
+    </script>
+</body>
+</html>
